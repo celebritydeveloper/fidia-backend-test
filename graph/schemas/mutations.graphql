@@ -1,4 +1,6 @@
 type Mutation {
 	register(payload: CreateUserInput!): Result
     login(payload: LoginUserInput!): Result
+    verifyAccount(resetToken: String!): Result
+    resendVerificationEmail(email: String!): Result
 }

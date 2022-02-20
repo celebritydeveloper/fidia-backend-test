@@ -135,7 +135,9 @@ const register = async (payload) => {
 			...payload,
 			firstName: name.split(" ")[0],
 			lastName: name.split(" ")[1],
-			id: generateUniqueId()
+			id: generateUniqueId(),
+            RESET_TOKEN: cryptoTokenBuffer(43),
+            RESET_TOKEN_TTL: EXTEND_PERIOD(24, "h", new Date(Date.now()))
 		});
 
 		// await sendMail({
@@ -152,8 +154,12 @@ const register = async (payload) => {
 			id: data.id
 		});
 
+		//let link = `${process.env.WEB_BASE_URL}/auth/password/reset/${user.RESET_TOKEN}`
+
         delete data._doc.status;
 		delete data._doc.password;
+
+
 		return {
 			success: true,
 			message: 'Successfully registered on Fidia 👏🏾👏🏾👏🏾',
@@ -217,6 +223,7 @@ const login = async (payload) => {
 		let token = generateToken({
 			id: user.id
 		});
+        
 
         delete user._doc.status;
 		delete user._doc.password;
@@ -229,6 +236,92 @@ const login = async (payload) => {
 		};
 	} catch (e) {
 		return new ErrorTrap(e);
+	}
+}
+
+
+
+const verifyAccount = async ({ resetToken }) => {
+	try {
+
+		const account = await $Users.findOne({RESET_TOKEN: resetToken});
+
+		if (!account) {
+			return {
+				success: true,
+				message: "Yo, yo, yo... this token is denied. 🤺",
+				data: null
+			}
+		}
+
+		const CURRENT_TIME = new Date(Date.now());
+
+		if (CURRENT_TIME.getTime() > account.RESET_TOKEN_TTL.getTime()) {
+            // await sendMail({
+            // 	to: email,
+            // 	data: {
+            // 	  name: name.split(" ")[0],
+            // 	  link: "https://fj-lite.netlify.app"
+            // 	},
+            // 	path: "signup",
+            // 	subject: `Welcome to Spire ${name.split(" ")[0]}`,
+            // });
+			return {
+				success: true,
+				message: `Yo, yo, yo... Token expired. A new verification email has been sent to ${account.email} 🤺`,
+				data: null
+			}
+		}
+
+		account.status = "activated";
+		await account.save();
+
+		return {
+			success: true,
+			message: "Your brand new Fidia account has been activated.",
+			data: null
+		}
+	} catch (e) {
+		return new ErrorTrap(e)
+	}
+}
+
+
+const resendVerificationEmail = async ({ email }) => {
+	try {
+
+		const account = await $Users.findOne({ email });
+
+		if (!account) {
+			return {
+				success: true,
+				message: "👀 No account related to this email address was found 😱!",
+				data: null
+			}
+		}
+
+		// await sendMail({
+            // 	to: email,
+            // 	data: {
+            // 	  name: name.split(" ")[0],
+            // 	  link: "https://fj-lite.netlify.app"
+            // 	},
+            // 	path: "signup",
+            // 	subject: `Welcome to Spire ${name.split(" ")[0]}`,
+         // });
+
+		// encrypt new pass and send email.
+
+		account.RESET_TOKEN_TTL = EXTEND_PERIOD(24, "h", new Date(Date.now()))
+		await account.save();
+
+		return {
+			success: true,
+			message: `Verification email has been sent to ${email}`,
+			data: null
+		}
+	} catch (e) {
+		return new ErrorTrap(e)
 	}
 }
 
@@ -367,4 +460,6 @@ export default {
 	register,
 	//forgotPassword,
 	login,
+    verifyAccount,
+    resendVerificationEmail
 };
