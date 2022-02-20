@@ -1,0 +1,4 @@
+type Query {
+	getFeedBlockById(id: String!): User
+	listAvailableFeedblocks: User
+}

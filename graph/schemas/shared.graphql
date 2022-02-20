@@ -1,0 +1,27 @@
+scalar DateTime
+scalar Any
+
+enum ReturnStatus {
+	OK
+	NOT_OK
+	ACTION_NOT_ALLOWED
+	ENTRY_CREATED
+	ENTRY_UPDATED
+	ENTRY_EXISTS
+	ENTRY_NOT_FOUND
+	ENTRY_DELETED
+	TOKEN_INVALID
+	TOKEN_EXPIRED
+	VALIDATION_ERROR
+	AUTHENTICATION_ERROR
+	AUTHORIZATION_ERROR
+	FATAL_ERROR
+}
+
+type Result {
+	success: Boolean!
+	message: String
+	returnStatus: ReturnStatus!
+	token: String
+	data: Any
+}
