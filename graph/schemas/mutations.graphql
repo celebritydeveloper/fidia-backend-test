@@ -1,3 +1,4 @@
 type Mutation {
 	register(payload: CreateUserInput!): Result
+    login(payload: LoginUserInput!): Result
 }

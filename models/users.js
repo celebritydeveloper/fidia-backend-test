@@ -40,37 +40,11 @@ const UserSchema = new Schema({
 		type: String,
 		required: true
 	},
-	useCase: {
-		type: String,
-		required: false
-	},
-	role: {
-		type: String,
-		required: false
-	},
-	lastLogin: {
-		type: Date,
-		require: false
-	},
-	newUser: {
-		type: Boolean,
-		default: true
-	},
 	status: {
 		type: String,
-		enum: ['activated', 'onboarding', 'deactivated'],
+		enum: ['activated', 'pending', 'deactivated'],
 		required: false,
-		default: 'onboarding',
-	},
-	profilePicture: {
-		type: String,
-		default: '',
-		required: false
-	},
-	address: {
-		type: String,
-		required: false,
-		default: ''
+		default: 'pending',
 	},
 	RESET_TOKEN: {
 		type: String,
@@ -80,14 +54,9 @@ const UserSchema = new Schema({
 		type: Date,
 		required: false
 	},
-	timeCreated: {
-		type: Date,
-		default: new Date(Date.now())
-	},
-	timeUpdated: {
-		type: Date,
-		default: new Date(Date.now())
-	}
+},
+{
+	timestamps: true
 }
 );
 

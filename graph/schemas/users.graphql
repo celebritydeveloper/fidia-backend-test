@@ -16,3 +16,8 @@ input CreateUserInput {
 	phone: String!
 	country: String!
 }
+
+input LoginUserInput {
+	email: String!
+	password: String!
+}

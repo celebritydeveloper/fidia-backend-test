@@ -1,4 +1,4 @@
-//import bcrypt from 'bcrypt-nodejs';
+import bcrypt from 'bcrypt-nodejs';
 //import axios from 'axios';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
@@ -7,9 +7,9 @@ import APP_ROOT from 'app-root-path';
 import { Secrets } from "../config";
 //import mailer from 'express-mailer';
 import path from 'path';
-//import {monotonicFactory} from 'ulid'
+import {monotonicFactory} from 'ulid'
 //import sendGridEmail from './sendgrid';
-//const ulid = monotonicFactory()
+const ulid = monotonicFactory()
 
 const app = require('express')();
 
@@ -108,9 +108,9 @@ export const generateId = (length = 10) => { // Default length is 10 Characters;
 	return result;
 };
 
-// export const generateUniqueId = () => {
-// 	return String(ulid()).toLowerCase()
-// }
+export const generateUniqueId = () => {
+	return String(ulid()).toLowerCase()
+}
 
 /**
  * Adds time to a date.
@@ -133,13 +133,13 @@ export const EXTEND_PERIOD = (
  * @param hashedPassword
  * @returns {boolean}
  */
-// export const verifyPassword = (providedPassword, hashedPassword) => {
-// 	try {
-// 		return Boolean(bcrypt.compareSync(providedPassword, hashedPassword));
-// 	} catch (e) {
-// 		return false;
-// 	}
-// };
+export const verifyPassword = (providedPassword, hashedPassword) => {
+	try {
+		return Boolean(bcrypt.compareSync(providedPassword, hashedPassword));
+	} catch (e) {
+		return false;
+	}
+};
 
 
 /**
@@ -148,8 +148,8 @@ export const EXTEND_PERIOD = (
  * @param providedPassword
  * @returns string
  */
-// export const encryptPassword = providedPassword => bcrypt
-// 	.hashSync(providedPassword, bcrypt.genSaltSync(10));
+export const encryptPassword = providedPassword => bcrypt
+	.hashSync(providedPassword, bcrypt.genSaltSync(10));
 
 /**
  * Token Verification Default Options.
