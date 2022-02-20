@@ -42,9 +42,9 @@ const UserSchema = new Schema({
 	},
 	status: {
 		type: String,
-		enum: ['activated', 'pending', 'deactivated'],
+		enum: ["activated", "pending", "deactivated"],
 		required: false,
-		default: 'pending',
+		default: "pending",
 	},
 	RESET_TOKEN: {
 		type: String,

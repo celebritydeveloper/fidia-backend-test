@@ -5,8 +5,15 @@ type User {
 	email: String!
 	phone: String!
 	country: String!
+	Status: Status!
 	createdAt: DateTime
 	updatedAt: DateTime
+}
+
+enum Status {
+	activated
+	deactivated
+	pending
 }
 
 input CreateUserInput {

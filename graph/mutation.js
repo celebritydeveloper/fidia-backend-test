@@ -5,10 +5,10 @@ const randomstring = require("randomstring");
 
 export default {
 	async register(_, args, ctx) {
-		return await Users.register(args.payload)
+		return await Users.register(args.payload);
 	},
 	async login(_, args, ctx) {
-		return await Users.login(args)
+		return await Users.login(args.payload);
 	},
 
 	// async forgotPassword(_, args, ctx) {

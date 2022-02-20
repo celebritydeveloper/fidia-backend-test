@@ -152,7 +152,7 @@ const register = async (payload) => {
 			id: data.id
 		});
 
-		delete data.password;
+        delete data._doc.status;
 		delete data._doc.password;
 		return {
 			success: true,
@@ -167,15 +167,20 @@ const register = async (payload) => {
 
 
 
-const login = async ({email, password}) => {
+const login = async (payload) => {
 	try {
+
+        const {
+			email,
+			password,
+		} = payload;
 
 		const schema = Joi.object()
 			.keys({
 				email: Joi.string().email().required(),
 				password: Joi.string().required(),
 			});
-		const validation = Joi.validate({email, password}, schema);
+		const validation = Joi.validate(payload, schema);
 
 		if (validation.error) {
 			return extractValidationErrorMessage(validation, null);
@@ -187,7 +192,15 @@ const login = async ({email, password}) => {
 		if (!user) {
 			return {
 				success: false,
-				message: '👀 Sorry, login failed! 👀, are you sure this is your account? or you neva sign up 🌚?',
+				message: "👀 Sorry, login failed! 👀, are you sure this is your account? or you neva sign up 🌚?",
+				error: ErrorTypes.AUTHENTICATION_ERROR
+			};
+		}
+
+        if (user.status === "pending") {
+			return {
+				success: false,
+				message: `👀You neva verify you email address, abeg check ${email} inbox to verify your account🌚?`,
 				error: ErrorTypes.AUTHENTICATION_ERROR
 			};
 		}
@@ -196,24 +209,23 @@ const login = async ({email, password}) => {
 		if (!verifyPassword(password, user.password)) {
 			return {
 				success: false,
-				message: '👀 Sorry, login failed! 👀, are you sure this is your account? or you neva sign up 🌚?',
+				message: "👀 Sorry, login failed! 👀, are you sure this is your account? or you neva sign up 🌚?",
 				error: ErrorTypes.AUTHENTICATION_ERROR
 			};
 		}
 
 		let token = generateToken({
 			id: user.id
-		})
+		});
 
-		delete user.password;
+        delete user._doc.status;
 		delete user._doc.password;
+
 		return {
 			success: true,
-			message: 'Successfully logged in to spire feedjet 👏🏾👏🏾👏🏾',
-			data: {
-				user,
-				token
-			}
+			message: "Successfully logged in to Fidia 👏🏾👏🏾👏🏾",
+			data: user,
+            token
 		};
 	} catch (e) {
 		return new ErrorTrap(e);
