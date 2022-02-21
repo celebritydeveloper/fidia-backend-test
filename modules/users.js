@@ -18,7 +18,7 @@ import {
  * @param filters
  * @return {Promise<ErrorTrap|{data: *, success: boolean, count}>}
  */
-const listUsers = async (filters) => {
+const listUser = async (filters) => {
 	try {
 		const {
 			pageCursor,
@@ -119,7 +119,6 @@ const register = async (payload) => {
 		}
 
 		payload.password = encryptPassword(password)
-		delete payload.confirmPassword
 
 		const existingUser = await $Users.findOne({ email });
 
@@ -133,9 +132,7 @@ const register = async (payload) => {
 
 		const data = await $Users.create({
 			...payload,
-			firstName: name.split(" ")[0],
-			lastName: name.split(" ")[1],
-			id: generateUniqueId(),
+            id: generateUniqueId(),
             RESET_TOKEN: cryptoTokenBuffer(43),
             RESET_TOKEN_TTL: EXTEND_PERIOD(24, "h", new Date(Date.now()))
 		});
@@ -248,8 +245,17 @@ const verifyAccount = async ({ resetToken }) => {
 
 		if (!account) {
 			return {
-				success: true,
+				success: false,
 				message: "Yo, yo, yo... this token is denied. 🤺",
+				data: null
+			}
+		}
+
+
+        if (account.status === "activated") {
+			return {
+				success: true,
+				message: "This account has already been verified... 🤺",
 				data: null
 			}
 		}
@@ -267,7 +273,7 @@ const verifyAccount = async ({ resetToken }) => {
             // 	subject: `Welcome to Spire ${name.split(" ")[0]}`,
             // });
 			return {
-				success: true,
+				success: false,
 				message: `Yo, yo, yo... Token expired. A new verification email has been sent to ${account.email} 🤺`,
 				data: null
 			}
@@ -294,7 +300,7 @@ const resendVerificationEmail = async ({ email }) => {
 
 		if (!account) {
 			return {
-				success: true,
+				success: false,
 				message: "👀 No account related to this email address was found 😱!",
 				data: null
 			}
@@ -336,72 +342,20 @@ const resendVerificationEmail = async ({ email }) => {
 //  * @param id
 //  * @param body
 //  */
-// const update = async (id = undefined, body = {}) => genericUpdate(id, body, {
-//     id: Joi.string()
-//         .required(),
-//     firstName: Joi.string()
-//         .optional(),
-//     lastName: Joi.string()
-//         .optional(),
-//     middleName: Joi.string()
-//         .optional(),
-//     phone: Joi.string()
-//         .regex(/([0-9])/)
-//         .max(15)
-//         .optional(),
-//     profilePicture: Joi.string()
-//         .optional()
-// });
-
-const forgotPassword = async ({email}) => {
+const listUsers = async () => {
 	try {
-		const schema = Joi.object()
-			.keys({
-				email: Joi.string().email().required(),
-			});
-		const validation = Joi.validate({email}, schema);
 
-		if (validation.error) {
-			return extractValidationErrorMessage(validation, null);
-		}
+        const query = {status: "activated"};
 
-
-		let user = await $Users.findOne({email})
-		if (!user) {
-			return {
-				success: true,
-				message: "⚡️ You will receive a password reset email if you have an account with us. Kindly check your email inbox. 🚀",
-				data: null
-			}
-		}
-
-		// generate crazy key.
-		user.RESET_TOKEN = cryptoTokenBuffer(43)
-		// Extend now by 15minutes.
-		user.RESET_TOKEN_TTL = EXTEND_PERIOD(15, "m", new Date(Date.now()))
-
-		await user.save()
-
-		let link = `${process.env.WEB_BASE_URL}/auth/password/reset/${user.RESET_TOKEN}`
-
-		console.log("Reset Token: => ", user.RESET_TOKEN);
-
-		// Build email template here..
-		await sendEmail('RESET_PASSWORD', {
-			to: [email],
-			subject: 'You or someone have requested for a password reset on your account 😱!',
-			props: {
-				email,
-				link,
-				WEB_BASE_URL: process.env.WEB_BASE_URL
-			}
-		});
-
+		let user = await $Users.find(query, {password: false}).sort({_id: -1});
+        
+        const count = await $Users.countDocuments(query);
 
 		return {
 			success: true,
-			message: "⚡️ You will receive a password reset email if you have an account with us. Kindly check your email inbox. 🚀",
-			data: null
+			message: "⚡️ Fetched all users successfully 🚀",
+			data: user,
+            count
 		}
 
 	} catch (e) {
@@ -409,57 +363,12 @@ const forgotPassword = async ({email}) => {
 	}
 }
 
-// const resetPassword = async ({resetToken, password, repeat_password}) => {
-// 	try {
-// 		const account = await $Users.findOne({RESET_TOKEN: resetToken});
-// 		if (!account) {
-// 			return {
-// 				success: true,
-// 				message: 'Yo, yo, yo... this token is denied. 🤺',
-// 				data
-// 			}
-// 		}
-
-// 		const CURRENT_TIME = new Date(Date.now());
-
-// 		if (CURRENT_TIME.getTime() > account.RESET_TOKEN_TTL.getTime()) {
-// 			return {
-// 				success: true,
-// 				message: 'Yo, yo, yo... this token is denied. 🤺',
-// 				data: null
-// 			}
-// 		}
-
-// 		// encrypt new pass and send email.
-
-// 		account.password = encryptPassword(password)
-// 		await account.save()
-
-// 		// Build email template here..
-// 		await sendEmail('RESET_PASSWORD_SUCCESS', {
-// 			to: [account.email],
-// 			subject: 'You have successfully reset your password',
-// 			props: {
-// 				WEB_BASE_URL: process.env.WEB_BASE_URL
-// 			}
-// 		});
-
-// 		return {
-// 			success: true,
-// 			message: 'Password reset success, please login with your new password to continue',
-// 			data: null
-// 		}
-// 	} catch (e) {
-// 		return new ErrorTrap(e)
-// 	}
-// }
 
 
 export default {
-	//resetPassword,
 	register,
-	//forgotPassword,
 	login,
     verifyAccount,
-    resendVerificationEmail
+    resendVerificationEmail,
+    listUsers
 };

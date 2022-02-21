@@ -1,11 +1,11 @@
 type User {
-	id: String!
-	firstName: String!
-	lastName: String!
-	email: String!
-	phone: String!
-	country: String!
-	Status: Status!
+	id: String
+	name: String
+	email: String
+	password: String                                                                                                    
+	phone: String
+	country: String
+	status: Status
 	createdAt: DateTime
 	updatedAt: DateTime
 }
@@ -27,4 +27,11 @@ input CreateUserInput {
 input LoginUserInput {
 	email: String!
 	password: String!
+}
+
+type UserList {
+	data: [User]
+	count: Int,
+	message: String
+	success: Boolean
 }

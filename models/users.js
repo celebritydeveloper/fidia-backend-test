@@ -5,7 +5,7 @@ User schema
 //import MongooseDelete from 'mongoose-delete';
 import mongoose from 'mongoose';
 import connection from './connection';
-//import {generateUniqueId} from "../utils";
+import {generateUniqueId} from "../utils";
 
 
 const {Schema} = mongoose;
@@ -13,16 +13,12 @@ const {Schema} = mongoose;
 const UserSchema = new Schema({
 	id: {
 		type: String,
-		//default: generateUniqueId(),
+		default: generateUniqueId(),
 		unique: true
 	},
-	firstName: {
+	name: {
 		type: String,
-		required: true
-	},
-	lastName: {
-		type: String,
-		required: true
+		required: false
 	},
 	email: {
 		type: String,
@@ -34,9 +30,13 @@ const UserSchema = new Schema({
 	phone: {
 		type: String,
 		sparse: true,
-		required: false
+		required: true
 	},
 	password: {
+		type: String,
+		required: true
+	},
+	country: {
 		type: String,
 		required: true
 	},
