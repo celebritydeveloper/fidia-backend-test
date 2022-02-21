@@ -69,7 +69,7 @@ app.options("*", cors());
 	  }  
 	});
 
-    	    server.listen({port: process.env.PORT || 5000, host: Secrets.HOST}).then(({url}) => {
+    	    server.listen().then(({url}) => {
 			console.log(`🚀  Server ready at ${url}`);
 		}).catch(err => {
 			console.log(err, " Failed to start server");
