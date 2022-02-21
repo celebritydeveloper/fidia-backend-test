@@ -242,7 +242,7 @@ const resendVerificationEmail = async ({ email }) => {
 			subject: `Welcome to Fidia ${account.name.split(" ")[0]}`,
 		});
 
-		account.RESET_TOKEN_TTL = EXTEND_PERIOD(24, "h", new Date(Date.now()))
+		account.RESET_TOKEN_TTL = EXTEND_PERIOD(24, "h", new Date(Date.now()));
 		await account.save();
 
 		return {
