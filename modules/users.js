@@ -2,6 +2,8 @@
 /* eslint-disable max-len */
 import Joi from "joi";
 import $Users from "../models/users";
+require("dotenv").config();
+import { Secrets } from "../config";
 import {
 	cryptoTokenBuffer,
 	encryptPassword,
@@ -10,83 +12,9 @@ import {
 	EXTEND_PERIOD,
 	extractValidationErrorMessage, generateToken, generateUniqueId,
 	verifyPassword,
-	//sendMail
+	sendEmail
 } from '../utils';
 
-/**
- *  List Users.
- * @param filters
- * @return {Promise<ErrorTrap|{data: *, success: boolean, count}>}
- */
-const listUser = async (filters) => {
-	try {
-		const {
-			pageCursor,
-			limit,
-			query,
-			status,
-			iso2
-		} = filters;
-
-
-		const q = {};
-
-		if (query) {
-			const newQuery = String(query).split(' ').join('|');
-			q.$or = [
-				{
-					firstName: {
-						$regex: `^(${newQuery})`,
-						$options: 'i'
-					}
-				},
-				{
-					lastName: {
-						$regex: `^(${newQuery})`,
-						$options: 'i'
-					}
-				},
-				{
-					email: {
-						$regex: `^(${newQuery})`,
-						$options: 'i'
-					}
-				},
-				{
-					phone: {
-						$regex: `^(${newQuery})`,
-						$options: 'i'
-					}
-				},
-			];
-		}
-
-		if (status) {
-			q.status = String(status).toLowerCase();
-		}
-		if (iso2) {
-			q.iso2 = String(iso2).trim().toUpperCase()
-		}
-
-		const data = await $Users.find(q, {
-			password: false,
-			RESET_TOKEN_TTL: false,
-			RESET_TOKEN: false
-		})
-			.sort({_id: -1})
-			.limit(Number(limit) || 100);
-
-
-		const count = await $Users.countDocuments(q);
-		return {
-			success: true,
-			data,
-			count
-		};
-	} catch (e) {
-		return new ErrorTrap(e);
-	}
-};
 
 
 /**
@@ -137,21 +65,19 @@ const register = async (payload) => {
             RESET_TOKEN_TTL: EXTEND_PERIOD(24, "h", new Date(Date.now()))
 		});
 
-		// await sendMail({
-		// 	to: email,
-		// 	data: {
-		// 	  name: name.split(" ")[0],
-		// 	  link: "https://fj-lite.netlify.app"
-		// 	},
-		// 	path: "signup",
-		// 	subject: `Welcome to Spire ${name.split(" ")[0]}`,
-		// });
+		await sendEmail({
+			to: email,
+			data: {
+			  name: name.split(" ")[0],
+			  link: `${Secrets.WEB_BASE_URL}/auth/password/reset/${data.RESET_TOKEN}`
+			},
+			path: "signup",
+			subject: `Welcome to Fidia ${name.split(" ")[0]}`,
+		});
 
 		let token = generateToken({
 			id: data.id
 		});
-
-		//let link = `${process.env.WEB_BASE_URL}/auth/password/reset/${user.RESET_TOKEN}`
 
         delete data._doc.status;
 		delete data._doc.password;
@@ -263,15 +189,15 @@ const verifyAccount = async ({ resetToken }) => {
 		const CURRENT_TIME = new Date(Date.now());
 
 		if (CURRENT_TIME.getTime() > account.RESET_TOKEN_TTL.getTime()) {
-            // await sendMail({
-            // 	to: email,
-            // 	data: {
-            // 	  name: name.split(" ")[0],
-            // 	  link: "https://fj-lite.netlify.app"
-            // 	},
-            // 	path: "signup",
-            // 	subject: `Welcome to Spire ${name.split(" ")[0]}`,
-            // });
+            await sendEmail({
+                to: account.email,
+                data: {
+                  name: account.name.split(" ")[0],
+                  link: `${Secrets.WEB_BASE_URL}/auth/password/reset/${account.RESET_TOKEN}`
+                },
+                path: "signup",
+                subject: `Welcome to Fidia ${account.name.split(" ")[0]}`,
+            });
 			return {
 				success: false,
 				message: `Yo, yo, yo... Token expired. A new verification email has been sent to ${account.email} 🤺`,
@@ -306,17 +232,15 @@ const resendVerificationEmail = async ({ email }) => {
 			}
 		}
 
-		// await sendMail({
-            // 	to: email,
-            // 	data: {
-            // 	  name: name.split(" ")[0],
-            // 	  link: "https://fj-lite.netlify.app"
-            // 	},
-            // 	path: "signup",
-            // 	subject: `Welcome to Spire ${name.split(" ")[0]}`,
-         // });
-
-		// encrypt new pass and send email.
+		await sendEmail({
+			to: account.email,
+			data: {
+			  name: account.name.split(" ")[0],
+			  link: `${Secrets.WEB_BASE_URL}/auth/password/reset/${account.RESET_TOKEN}`
+			},
+			path: "signup",
+			subject: `Welcome to Fidia ${account.name.split(" ")[0]}`,
+		});
 
 		account.RESET_TOKEN_TTL = EXTEND_PERIOD(24, "h", new Date(Date.now()))
 		await account.save();

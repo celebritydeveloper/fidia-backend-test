@@ -1,31 +1,13 @@
 import bcrypt from 'bcrypt-nodejs';
-//import axios from 'axios';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import moment from 'moment';
-import APP_ROOT from 'app-root-path';
 import { Secrets } from "../config";
-//import mailer from 'express-mailer';
-import path from 'path';
 import {monotonicFactory} from 'ulid'
-//import sendGridEmail from './sendgrid';
-const ulid = monotonicFactory()
-
-const app = require('express')();
-
+import sendEmailService from './email';
+const ulid = monotonicFactory();
 require('dotenv').config();
 
-app.set('views', path.join(__dirname, '../../views'));
-app.set('view engine', 'pug');
-
-// mailer.extend(app, {
-// 	host: process.env.EMAIL_HOST,
-// 	port: process.env.EMAIL_PORT,
-// 	auth: {
-// 		user: process.env.EMAIL_USERNAME,
-// 		pass: process.env.EMAIL_PASSWORD
-// 	}
-// });
 
 
 
@@ -156,10 +138,10 @@ export const encryptPassword = providedPassword => bcrypt
  * @type {{issuer: string}}
  */
 export const verifyTokenOptions = {
-	issuer: 'Spirē Technologies Inc.',
-	subject: 'SPIRĒ Tech Gunjalis ⚡️ [Author: Justice Nefe & Kells Gingerman.]',
+	issuer: 'FIDIA Technologies Inc.',
+	subject: 'FIDIA Gingerman.]',
 	audience: ['World'],
-	algorithms: ['HS256']
+	algorithm: 'HS256',
 };
 
 
@@ -170,8 +152,8 @@ export const verifyTokenOptions = {
  */
 export const generateToken = (data) => {
 	const signOptions = {
-		issuer: 'Spirē Technologies Inc.',
-		subject: 'SPIRĒ Tech Gunjalis ⚡️ [Author: Justice Nefe & Kells Gingerman.]',
+		issuer: 'FIDIA Technologies Inc.',
+		subject: 'FIDIA Gingerman.]',
 		audience: ['World'],
 		algorithm: 'HS256',
 	};
@@ -222,49 +204,5 @@ export const cryptoTokenBuffer = (length = 56) => crypto.randomBytes(length)
  * @returns {*}
  */
 
-//export const sendMail = sendGridEmail;
+export const sendEmail = sendEmailService;
 
-// export const sendEmail = (TEMPLATE, {
-// 	subject = '',
-// 	to = [],
-// 	props = {},
-// }) => {
-// 	if (process.env.NODE_ENV === 'test') {
-// 		return true;
-// 	}
-// 	const cb = (err, info) => {
-// 		if (err) {
-// 			console.error(err, ' :=> Error Response = Mailer');
-// 			return false;
-// 		}
-// 		console.info(info, ' :=> Info Response = Mailer');
-// 		return true;
-// 	};
-// 	const modifiedProps = {
-// 		...props,
-// 		currentYear: new Date().getFullYear(),
-// 		feedBackMail: 'fire@spire.africa',
-// 		feedbackPhone: '0812SPIRE-NATION'
-// 	};
-// 	return app['mailer'].send(`${APP_ROOT}/views/emails/${TEMPLATE}`, {
-// 		from: process.env.EMAIL_USERNAME,
-// 		to, // REQUIRED. This can be a comma delimited string just like a normal email `to` field.
-// 		subject,
-// 		APP_URL: process.env.WEB_BASE_URL,
-// 		...modifiedProps
-// 		// All additional properties are also passed to the template as local
-// 		// variables.
-// 	}, cb);
-// };
-
-// export const cleanEmpty = obj => {
-// 	if (Array.isArray(obj)) {
-// 		return obj
-// 			.map(v => (v && typeof v === 'object') ? cleanEmpty(v) : v)
-// 			.filter(v => !(v == null));
-// 	} else {
-// 		return Object.entries(obj)
-// 			.map(([k, v]) => [k, v && typeof v === 'object' ? cleanEmpty(v) : v])
-// 			.reduce((a, [k, v]) => (v == null ? a : (a[k] = v, a)), {});
-// 	}
-// }
