@@ -37,7 +37,6 @@ const transporter = nodemailer.createTransport({
         subject,
         html,
       });
-      console.log("Sent abeg");
     } catch (error) {
       console.log(error);
       if(error.response) {

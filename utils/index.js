@@ -40,7 +40,7 @@ export const ErrorTypes = {
 export class ErrorTrap {
 	constructor(e) {
 		if (e.name !== 'ValidationError') {
-			console.log(e, ' Error Caught In Error Trap.'); // TODO: Plug ElasticAPM Here.
+			console.log(e, ' Error Caught In Error Trap.'); 
 		}
 		this.message = e.message;
 		this.success = false;
