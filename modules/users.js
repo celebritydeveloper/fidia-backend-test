@@ -228,7 +228,17 @@ const resendVerificationEmail = async ({ email }) => {
 			return {
 				success: false,
 				message: "👀 No account related to this email address was found 😱!",
-				data: null
+				data: null,
+				returnStatus: ErrorTypes.PERMISSION_ERROR
+			}
+		}
+
+		if (account.status === "activated") {
+			return {
+				success: false,
+				message: "This account has already been verified... 🤺",
+				data: null,
+				returnStatus: ErrorTypes.PERMISSION_ERROR
 			}
 		}
 
@@ -261,11 +271,6 @@ const resendVerificationEmail = async ({ email }) => {
 
 
 
-// /**
-//  * To Update a user account as an account owner
-//  * @param id
-//  * @param body
-//  */
 const listUsers = async () => {
 	try {
 

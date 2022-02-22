@@ -10,13 +10,6 @@ export const checkAuthenticatedUser = (ctx) => {
 	return null
 }
 
-export const checkAuthorization = (original, allowed) => {
-	if (original !== allowed) {
-		return new ForbiddenError("Ehn?, you shall not pass! no be you get this business 😡")
-	}
-
-	return null
-}
 
 
 export const getAuthenticatedAccountMiddleware = async (authorization) => {

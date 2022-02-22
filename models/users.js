@@ -4,7 +4,7 @@ User schema
 //import MongooseValidation from 'mongoose-beautiful-unique-validation';
 //import MongooseDelete from 'mongoose-delete';
 import mongoose from 'mongoose';
-import connection from './connection';
+import connection from '../database/index';
 import {generateUniqueId} from "../utils";
 
 
@@ -60,14 +60,4 @@ const UserSchema = new Schema({
 }
 );
 
-// UserSchema.index({
-// 	firstName: 'text',
-// 	lastName: 'text',
-// 	email: 'text',
-// 	phone: 'text',
-// });
-
-// UserSchema.plugin(MongooseValidation);
-// UserSchema.plugin(MongooseDelete, {overrideMethods: 'all'});
-
-export default connection.model('users', UserSchema);
+export default mongoose.model('users', UserSchema);

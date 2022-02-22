@@ -14,8 +14,7 @@ app.use(cors());
 app.options("*", cors());
 
 
-(async function startApolloServer() {
-	//const httpServer = http.createServer(app);
+async function startApolloServer() {
 	let schemas = await Schemas()
 	const typeDefinitions = gql`${schemas}`;
 
@@ -35,5 +34,9 @@ app.options("*", cors());
 		}).catch(err => {
 			console.log(err, " Failed to start server");
 		});
-}());
+};
+
+startApolloServer();
+
+module.exports = app;
 
