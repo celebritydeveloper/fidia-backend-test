@@ -1,7 +1,6 @@
 import Users from "../modules/users"
 import {checkAuthenticatedUser } from "../middlewares";
 import { ApolloError } from "apollo-server";
-const randomstring = require("randomstring");
 
 export default {
 	async register(_, args, ctx) {
